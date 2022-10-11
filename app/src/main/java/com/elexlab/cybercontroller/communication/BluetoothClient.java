@@ -12,7 +12,11 @@ import android.util.Log;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executor;
+
+import com.elexlab.cybercontroller.CyberApplication;
+import com.elexlab.cybercontroller.utils.SharedPreferencesUtil;
 
 public class BluetoothClient extends BluetoothHidDevice.Callback{
     private static final String TAG = BluetoothClient.class.getSimpleName();
@@ -113,8 +117,11 @@ public class BluetoothClient extends BluetoothHidDevice.Callback{
 
     private class ServiceListener implements BluetoothProfile.ServiceListener{
 
+        private int profile;
+
         @Override
         public void onServiceConnected(int profile, BluetoothProfile proxy) {
+            this.profile = profile;
             Log.i(TAG, "Connected to service");
             if (profile != BluetoothProfile.HID_DEVICE) {
                 Log.wtf(TAG, "WTF:"+profile);
@@ -125,6 +132,7 @@ public class BluetoothClient extends BluetoothHidDevice.Callback{
 
                 return;
             }
+            Log.d(TAG,"lalala proxy:"+proxy);
             btHid= (BluetoothHidDevice)proxy;
             active();
 
@@ -187,12 +195,20 @@ public class BluetoothClient extends BluetoothHidDevice.Callback{
         {
             int[] states = new int[]{BluetoothProfile.STATE_CONNECTING,BluetoothProfile.STATE_CONNECTED,BluetoothProfile.STATE_DISCONNECTED,BluetoothProfile.STATE_DISCONNECTING};
             List<BluetoothDevice> pairedDevices = btHid.getDevicesMatchingConnectionStates(states);
+            Log.d(TAG,"lalala btHid:"+btHid);
+            Log.d(TAG,"lalala Tag:"+TAG);
             Log.d(TAG, "paired devices: "+pairedDevices);
+            Log.d(TAG, "lalala bonded devices: "+btAdapter.getBondedDevices());
             mpluggedDevice = pluggedDevice;
             if (pluggedDevice != null && btHid.getConnectionState(pluggedDevice) == BluetoothProfile.STATE_DISCONNECTED) {
                 btHid.connect(pluggedDevice);
             } else {
-                BluetoothDevice pairedDevice =  pairedDevices.get(0);
+                BluetoothDevice pairedDevice;
+                if (pairedDevices.size() > 0) {
+                    pairedDevice =  pairedDevices.get(0);
+                } else {
+                    pairedDevice = getPcBluetoothDevice();
+                }
 
                 int pairedDState = btHid.getConnectionState(pairedDevice);
                 Log.d(TAG,"paired "+pairedDState);
@@ -204,5 +220,24 @@ public class BluetoothClient extends BluetoothHidDevice.Callback{
         }
     }
 
+    private BluetoothDevice getPcBluetoothDevice() {
+        String pcBluetoothDevice = "";
+        pcBluetoothDevice = SharedPreferencesUtil.getPreference(CyberApplication.getContext(),"settings","btName", pcBluetoothDevice);
+        Log.d(TAG, "lalala bluetooth name: "+pcBluetoothDevice);
+        if (btAdapter == null || pcBluetoothDevice.isEmpty()) {
+            return null;
+        }
+
+        Set<BluetoothDevice> devices = btAdapter.getBondedDevices();
+        Log.d(TAG, "lalala bonded devices: "+devices);
+        for (BluetoothDevice btdev : devices) {
+            if (btdev.getName().equals(pcBluetoothDevice)) {
+                Log.d(TAG, "lalala find devices: "+btdev);
+                return btdev;
+            }
+        }
+
+        return null;
+    }
 
 }

@@ -185,17 +185,31 @@ public class LoginActivity extends Activity {
 
     private void unLock(){
         bluetoothKeyboard.sendKey("ESC");
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        bluetoothKeyboard.sendKey("ESC");
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 bluetoothKeyboard.sendKey("1");
-                bluetoothKeyboard.sendKey("q");
-                bluetoothKeyboard.sendKey("a");
-                bluetoothKeyboard.sendKey("z");
-                bluetoothKeyboard.sendKey("@");
-                bluetoothKeyboard.sendKey("W");
-                bluetoothKeyboard.sendKey("S");
-                bluetoothKeyboard.sendKey("X");
+                bluetoothKeyboard.sendKey("2");
+                bluetoothKeyboard.sendKey("3");
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                bluetoothKeyboard.sendKey("1");
+                bluetoothKeyboard.sendKey("4");
+                bluetoothKeyboard.sendKey("7");
                 bluetoothKeyboard.sendKey("Enter");
             }
         },500);

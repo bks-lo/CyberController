@@ -150,9 +150,11 @@ public class MainActivity extends Activity {
             });
             EditText etHostIp = settingView.findViewById(R.id.etHostIp);
             EditText etHostPort = settingView.findViewById(R.id.etHostPort);
+            EditText etBtname = settingView.findViewById(R.id.etBtName);
             etHostIp.setText(SharedPreferencesUtil.getPreference(MainActivity.this,"settings","hostIp","not set yet"));
             int port = SharedPreferencesUtil.getPreference(MainActivity.this,"settings","hostPort",2233);
             etHostPort.setText(String.valueOf(port));
+            etBtname.setText(SharedPreferencesUtil.getPreference(MainActivity.this,"settings","btName","not set yet"));
 
             settingView.findViewById(R.id.btnSave).setOnClickListener((View v)->{
                 Map<String,Object> preferences = new HashMap<String,Object>();
@@ -165,6 +167,7 @@ public class MainActivity extends Activity {
                     Toast.makeText(MainActivity.this,"端口号必须是数字",Toast.LENGTH_SHORT).show();
 
                 }
+                preferences.put("btName",etBtname.getText().toString());
                 SharedPreferencesUtil.setPreferences(MainActivity.this,"settings",preferences);
                 Toast.makeText(MainActivity.this,"设置已更新,重启App生效",Toast.LENGTH_LONG).show();
                 dialog.dismiss();
